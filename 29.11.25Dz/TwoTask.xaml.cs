@@ -26,6 +26,8 @@ namespace _29._11._25Dz
         private Task producerTask;
         private Task consumerTask;
 
+
+
         private int itemCounter = 0;
 
         public TwoTask()
