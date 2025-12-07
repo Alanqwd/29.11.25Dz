@@ -15,112 +15,124 @@ namespace _29._11._25Dz
    
        public partial class MainWindow : Window
        {
-          private int sharedCounter = 0;
-          private readonly object lock_Obj = new object();
-          private readonly object monitor_Obj = new object();
-
-
+          private int sharedData = 0;
+          private readonly object lockObject = new object();
 
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        private void BtnRaceCondition_Click(object sender, RoutedEventArgs e)
+        private void BtnRace_Click(object sender, RoutedEventArgs e)
         {
-            txtOutput.Clear();
-            sharedCounter = 0;
-            AppendOutput("Запуск гонки данных без синхронизации...\n");
+            txtStatus.Text = "Запущена гонка данных (без синхронизации)";
+            sharedData = 0;
 
-          
-            Task task1 = Task.Run(() => IncrementWithoutSync("Поток 1"));
-            Task task2 = Task.Run(() => IncrementWithoutSync("Поток 2"));
-
-            Task.WaitAll(task1, task2);
-
-            AppendOutput($"Результат без синхронизации: {sharedCounter}\n");
-        }
-
-        private void IncrementWithoutSync(string threadName)
-        {
-            for (int i = 0; i < 1000; i++)
+            
+            for (int i = 0; i < 5; i++)
             {
-               
-                sharedCounter++;
-                Thread.Sleep(1);
+                int threadNum = i;
+                Task.Run(() =>
+                {
+                    for (int j = 0; j < 1000; j++)
+                    {
+                    
+                        sharedData++;
+                        Dispatcher.Invoke(() =>
+                        {
+                            txtStatus.Text = $"Поток {threadNum} увеличил значение: {sharedData}";
+                        });
+                        Thread.Sleep(1);
+                    }
+                });
             }
         }
 
         private void BtnLock_Click(object sender, RoutedEventArgs e)
         {
-            txtOutput.Clear();
-            sharedCounter = 0;
-            AppendOutput("Запуск безопасного добавления с lock...\n");
+            txtStatus.Text = "Запущено безопасное добавление с lock";
+            sharedData = 0;
 
-            Task task1 = Task.Run(() => SafeIncrement("Поток 1"));
-            Task task2 = Task.Run(() => SafeIncrement("Поток 2"));
-
-            Task.WaitAll(task1, task2);
-
-            AppendOutput($"Результат с lock: {sharedCounter}\n");
-        }
-
-        private void SafeIncrement(string threadName)
-        {
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 5; i++)
             {
-                lock (lock_Obj)
+                int threadNum = i;
+                Task.Run(() =>
                 {
-                    sharedCounter++;
-                }
-                Thread.Sleep(1);
+                    for (int j = 0; j < 1000; j++)
+                    {
+                        lock (lockObject)
+                        {
+                            sharedData++;
+                        }
+                        Dispatcher.Invoke(() =>
+                        {
+                            txtStatus.Text = $"Поток {threadNum} безопасно увеличил: {sharedData}";
+                        });
+                        Thread.Sleep(1);
+                    }
+                });
             }
         }
 
-        private void BtnMonitorTimeout_Click(object sender, RoutedEventArgs e)
+        private void BtnMonitor_Click(object sender, RoutedEventArgs e)
         {
-            txtOutput.Clear();
-            AppendOutput("Проверка монитора с таймаутом...\n");
+            txtStatus.Text = "Проверка с Monitor.TryEnter";
+            sharedData = 0;
+            object monitorObject = new object();
 
-            if (Monitor.TryEnter(monitor_Obj, TimeSpan.FromSeconds(1)))
+            for (int i = 0; i < 5; i++)
             {
-                try
+                int threadNum = i;
+                Task.Run(() =>
                 {
-                    AppendOutput("Успешно захватили монитор.\n");
-                    
-                    Thread.Sleep(2000);
-                }
-                finally
-                {
-                    Monitor.Exit(monitor_Obj);
-                    AppendOutput("Освободили монитор.\n");
-                }
-            }
-            else
-            {
-                AppendOutput("Не удалось захватить монитор за отведенное время.\n");
+                    for (int j = 0; j < 1000; j++)
+                    {
+                        bool lockTaken = false;
+                        try
+                        {
+                      
+                            lockTaken = Monitor.TryEnter(monitorObject, TimeSpan.FromMilliseconds(100));
+                            if (lockTaken)
+                            {
+                       
+                                sharedData++;
+                                Dispatcher.Invoke(() =>
+                                {
+                                    txtStatus.Text = $"Поток {threadNum} увеличил: {sharedData}";
+                                });
+                            }
+                            else
+                            {
+                              
+                                Dispatcher.Invoke(() =>
+                                {
+                                    txtStatus.Text = $"Поток {threadNum} не смог захватить монитор";
+                                });
+                            }
+                        }
+                        finally
+                        {
+                            if (lockTaken)
+                                Monitor.Exit(monitorObject);
+                        }
+                        Thread.Sleep(1);
+                    }
+                });
             }
         }
-
-        private void AppendOutput(string text)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                txtOutput.AppendText(text);
-                txtOutput.ScrollToEnd();
-            });
-        }
-
         private void btnTwoTask_Click(object sender, RoutedEventArgs e)
         {
 
             TwoTask Case = new TwoTask();
             Case.Show();
 
+
+
         }
 
 
 
-
     }
+
+
 }

@@ -8,12 +8,13 @@
         Title="Задание-1" Height="450" Width="800">
     <Grid>
         <StackPanel Margin="10">
-            <Button Name="btnRaceCondition" Content="Запустить гонку данных" Margin="0,5" Click="BtnRaceCondition_Click"/>
-            <Button Name="btnLock" Content="Запустить безопасное добавление" Margin="0,5" Click="BtnLock_Click"/>
-            <Button Name="btnMonitorTimeout" Content="Проверить монитор с таймаутом" Margin="0,5" Click="BtnMonitorTimeout_Click"/>
-            <TextBox Name="txtOutput" Margin="0,10" Height="100" IsReadOnly="True" TextWrapping="Wrap"/>
-            <Button x:Name="TwoTask" Click="btnTwoTask_Click"  Height="50">Нажмите чтобы перейти на 2 задание</Button>
+        <Button x:Name="btnRace" Content="Запустить гонку данных" Click="BtnRace_Click" Margin="5"/>
+        <Button x:Name="btnLock" Content="Запустить безопасное добавление" Click="BtnLock_Click" Margin="5"/>
+        <Button x:Name="btnMonitor" Content="Проверить монитор с таймаутом" Click="BtnMonitor_Click" Margin="5"/>
+        <TextBlock x:Name="txtStatus" Text="Статус" Margin="10" FontSize="16"/>
+        <Button x:Name="TwoTask" Click="btnTwoTask_Click"  Height="50">Нажмите чтобы перейти на 2 задание</Button>
         </StackPanel>
 
+     
     </Grid>
 </Window>

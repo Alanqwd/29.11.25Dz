@@ -62,7 +62,7 @@ namespace _29._11._25Dz
                         itemCounter++;
                         sharedList.Add(itemCounter);
                         AppendLog($"Производитель добавил: {itemCounter}");
-                        Monitor.Pulse(lock_Obj); 
+                        Monitor.Pulse(lock_Obj);
                     }
                     Thread.Sleep(500);
                 }
@@ -81,12 +81,12 @@ namespace _29._11._25Dz
                     {
                         while (sharedList.Count == 0)
                         {
-                            Monitor.Wait(lock_Obj); 
+                            Monitor.Wait(lock_Obj);
                         }
                         item = sharedList[0];
                         sharedList.RemoveAt(0);
                     }
-                    
+
                     AppendLog($"Потребитель обработал: {item}");
                     Thread.Sleep(1000);
                 }
